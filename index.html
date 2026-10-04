@@ -1,4 +1,7 @@
-<title>Royals on the 2A Curve</title>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Royals on the Curve</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
@@ -34,9 +37,12 @@ header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-be
   text-transform:uppercase;color:var(--blue);margin-bottom:8px}
 h1{font-family:'Instrument Serif',Georgia,serif;font-size:clamp(32px,5vw,58px);
   line-height:1;margin:0;font-weight:400;text-wrap:balance}
-.standfirst{font-size:14px;line-height:1.55;max-width:360px;color:var(--gray)}
+.standfirst{font-size:14px;line-height:1.55;max-width:380px;color:var(--gray);margin:0}
 
 .controls{display:flex;flex-wrap:wrap;align-items:center;gap:14px;margin-top:18px}
+select.race{appearance:none;-webkit-appearance:none;border:1px solid var(--blue);border-radius:2px;background:var(--chip-on-bg) url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2710%27 height=%276%27%3E%3Cpath d=%27M0 0l5 6 5-6z%27 fill=%27%23fff%27/%3E%3C/svg%3E") no-repeat right 12px center;color:var(--chip-on-fg);font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;padding:10px 34px 10px 14px;cursor:pointer;min-width:260px}
+select.race:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+select.race option,select.race optgroup{background:var(--paper);color:var(--ink);text-transform:none;letter-spacing:0}
 .seg{display:inline-flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden}
 .seg button{appearance:none;border:0;background:var(--chip-bg);color:var(--gray);
   font:500 12px/1 'IBM Plex Mono',monospace;letter-spacing:.12em;text-transform:uppercase;
@@ -51,9 +57,14 @@ h1{font-family:'Instrument Serif',Georgia,serif;font-size:clamp(32px,5vw,58px);
 .fieldnote{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.06em;
   color:var(--muted);font-variant-numeric:tabular-nums}
 
+.summary{display:flex;flex-wrap:wrap;gap:28px;padding:18px 2px 4px}
+.stat .v{font-family:'Instrument Serif',Georgia,serif;font-size:34px;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums}
+.stat .k{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+
 .legend{display:flex;gap:22px;flex-wrap:wrap;align-items:center;font-size:12px;
   color:var(--gray);padding:16px 2px 8px}
 .legend .dot{width:11px;height:11px;border-radius:50%;background:var(--blue);display:inline-block}
+.legend .dot.alt{background:var(--band)}
 .legend .dash{width:16px;border-top:1px dashed var(--band);display:inline-block}
 .legend span{display:flex;align-items:center;gap:8px}
 .axis-hint{font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;
@@ -113,25 +124,22 @@ h1{font-family:'Instrument Serif',Georgia,serif;font-size:clamp(32px,5vw,58px);
 @media (prefers-reduced-motion:reduce){.tip{transition:none}}
 .empty{font-size:13px;color:var(--muted);padding:40px 0;text-align:center}
 footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-size:12px;
-  color:var(--muted);font-family:'IBM Plex Mono',monospace}
-@media (max-width:640px){.wrap{padding:28px 16px 56px}.axis-hint{margin-left:0}}
-</style>
-
+  color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.6}
+@media (max-width:640px){.wrap{padding:28px 16px 56px}.axis-hint{margin-left:0}.spacer{margin-left:0}}
+</style></head><body>
 <div class="wrap">
   <header>
     <div>
-      <div class="eyebrow">Voyles Classic · 5 Sep 2026 · High School 2A</div>
-      <h1 id="title">The Royals on the 2A curve</h1>
+      <div class="eyebrow" id="eyebrow">Loading races…</div>
+      <h1 id="title">The Royals on the curve</h1>
     </div>
+    <p class="standfirst" id="stand"></p>
   </header>
-
   <div class="controls">
-    <div class="seg" role="group" aria-label="Team">
-      <button type="button" data-team="boys" aria-pressed="true">Boys</button>
-      <button type="button" data-team="girls" aria-pressed="false">Girls</button>
-    </div>
+    <select class="race" id="race" aria-label="Race"></select>
     <button class="linkbtn" type="button" id="allBtn">Select all</button>
     <button class="linkbtn" type="button" id="sevenBtn">Scoring seven</button>
+    <button class="linkbtn" type="button" id="fiveBtn">Scoring five</button>
     <button class="linkbtn" type="button" id="noneBtn">Clear</button>
     <span class="fieldnote spacer" id="fieldnote"></span>
     <div class="seg" role="group" aria-label="Appearance">
@@ -139,76 +147,25 @@ footer{margin-top:28px;padding-top:14px;border-top:1px solid var(--rule);font-si
       <button type="button" data-theme-btn="dark" aria-pressed="false">Dark</button>
     </div>
   </div>
-
+  <div class="summary" id="summary"></div>
   <div class="legend">
     <span><i class="dot"></i>Scoring five</span>
+    <span><i class="dot alt"></i>6th–7th and beyond</span>
     <span><i class="dash"></i>Field mean (z = 0)</span>
     <span class="axis-hint">Faster ←&nbsp; z-score &nbsp;→ Slower</span>
   </div>
-
-  <div class="chart" id="chart"></div>
+  <div class="chart" id="chart"><p class="empty">Reading the race sheets…</p></div>
   <div class="roster">
     <h2 id="rosterHead">Roster</h2>
     <div class="chips" id="chips"></div>
   </div>
   <footer id="foot"></footer>
 </div>
-
 <script>
-// Voyles Classic 2026, High School 2A — MLK finishers.
-// [name, class, mark, seconds, z, 2A rank, pct of field beaten, team finish #]
-const TEAMS = {
-  boys: {
-    label: "Boys", scorers: 5, mean: 1322.690, sd: 202.763,
-    stand: "Every Royal boy who finished the 2A 5K, placed on the normal curve of that day's division field. Left of centre is faster than average.",
-    runners: [
-      ["Brent Ferrell","SR","15:55.25",955.25,-1.812,2,99.5,1],
-      ["Miles Fowler","JR","17:50.54",1070.54,-1.244,17,91.2,2],
-      ["Dillon Fell","JR","18:18.60",1098.60,-1.105,23,87.9,3],
-      ["Claude Yriart","SO","18:54.66",1134.66,-0.927,32,82.9,4],
-      ["Samuel Petrony","SR","19:26.82",1166.82,-0.769,41,77.9,5],
-      ["Rolando Muniz-Huerta","JR","19:31.28",1171.28,-0.747,44,76.2,6],
-      ["Tanner Jones","JR","19:44.90",1184.90,-0.680,51,72.4,7],
-      ["Cooper Wallace","JR","22:03.40",1323.40,0.004,101,44.8,8],
-      ["Ben Lewis","SO","23:42.86",1422.86,0.494,129,29.3,9],
-      ["Cooper Hubbard","JR","23:46.74",1426.74,0.513,131,28.2,10],
-      ["Winston Walker","JR","23:48.99",1428.99,0.524,132,27.6,11],
-      ["Harper Bush","JR","24:15.97",1455.97,0.657,139,23.8,12],
-      ["Will Blocher","SO","24:20.71",1460.71,0.681,141,22.7,13],
-      ["Liam Durham","SO","24:21.02",1461.02,0.682,142,22.1,14],
-      ["Joseph Lambert","JR","24:46.58",1486.58,0.808,145,20.4,15],
-      ["Campbell Gnetz","JR","25:08.85",1508.85,0.918,146,19.9,16],
-      ["Ethan Newberry","FR","25:09.97",1509.97,0.924,147,19.3,17],
-      ["Oscar Spitzer","SR","25:13.22",1513.22,0.940,148,18.8,18],
-      ["Damien Tellez","JR","26:13.05",1573.05,1.235,160,12.2,19],
-      ["Colin Dinh","JR","26:23.26",1583.26,1.285,161,11.6,20],
-      ["Will Lindstrom","FR","27:10.48",1630.48,1.518,166,8.8,21],
-      ["Brandon Johnson","JR","28:03.28",1683.28,1.778,172,5.5,22],
-      ["Jack Edmonson","SO","28:06.43",1686.43,1.794,173,5.0,23]
-    ]
-  },
-  girls: {
-    label: "Girls", scorers: 5, mean: 1632.985, sd: 319.931,
-    stand: "Every Royal girl who finished the 2A 5K, placed on the normal curve of that day's division field. Left of centre is faster than average.",
-    runners: [
-      ["Vicki Grammer","SO","24:34.43",1474.43,-0.496,43,65.3,1],
-      ["Ruby York","SO","24:49.44",1489.44,-0.449,45,63.6,2],
-      ["Ellianna Wicker","SO","25:20.70",1520.70,-0.351,50,59.5,3],
-      ["Eleanor Bonino","JR","25:34.96",1534.96,-0.306,54,56.2,4],
-      ["Emmy Kotras","FR","25:50.44",1550.44,-0.258,59,52.1,5],
-      ["Margaret Ward","SO","26:20.53",1580.53,-0.164,64,47.9,6],
-      ["Olivia Collins","SR","29:39.64",1779.64,0.458,89,27.3,7],
-      ["Nevaeh Bowers","SR","36:37.27",2197.27,1.764,114,6.6,8],
-      ["Kenzie Wilcox","SO","40:36.98",2436.98,2.513,119,2.5,9],
-      ["Ivy Brame-Blake","SR","43:28.02",2608.02,3.048,120,1.7,10],
-      ["Leah Hatt","SO","45:02.57",2702.57,3.343,121,0.8,11],
-      ["Ava Sanderfur","SO","45:02.96",2702.96,3.344,122,0.0,12]
-    ]
-  }
-};
-
-let team = "boys";
-let picked = new Set();          // team finish # currently shown
+window.__DEMO=[{"id": "Voyles Boys 2A", "meet": "Voyles", "label": "Boys 2A", "title": "Voyles Classic 2026 \u2014 High School 2A Boys 5000m", "rankLabel": "2A", "field": 182, "mean": 1322.69, "sd": 202.763, "result": {"place": 3, "of": 14, "pts": 113, "avg": "18:05"}, "runners": [["Brent Ferrell", "SR", "15:55.25", 955.25, -1.812, 2, 99.4, 1], ["Miles Fowler", "JR", "17:50.54", 1070.54, -1.244, 17, 91.2, 2], ["Dillon Fell", "JR", "18:18.60", 1098.6, -1.105, 23, 87.8, 3], ["Claude Yriart", "SO", "18:54.66", 1134.66, -0.927, 32, 82.9, 4], ["Samuel Petrony", "SR", "19:26.82", 1166.82, -0.769, 41, 77.9, 5], ["Rolando Muniz-Huerta", "JR", "19:31.28", 1171.28, -0.747, 44, 76.2, 6], ["Tanner Jones", "JR", "19:44.90", 1184.9, -0.68, 51, 72.4, 7], ["Cooper Wallace", "JR", "22:03.40", 1323.4, 0.004, 101, 44.8, 8], ["Ben Lewis", "SO", "23:42.86", 1422.86, 0.494, 129, 29.3, 9], ["Cooper Hubbard", "JR", "23:46.74", 1426.74, 0.513, 131, 28.2, 10], ["Winston Walker", "JR", "23:48.99", 1428.99, 0.524, 132, 27.6, 11], ["Harper Bush", "JR", "24:15.97", 1455.97, 0.657, 139, 23.8, 12], ["Will Blocher", "SO", "24:20.71", 1460.71, 0.681, 141, 22.6, 13], ["Liam Durham", "SO", "24:21.02", 1461.02, 0.682, 142, 22.1, 14], ["Joseph Lambert", "JR", "24:46.58", 1486.58, 0.808, 145, 20.4, 15], ["Campbell Gnetz", "JR", "25:08.85", 1508.85, 0.918, 146, 19.9, 16], ["Ethan Newberry", "FR", "25:09.97", 1509.97, 0.924, 147, 19.3, 17], ["Oscar Spitzer", "SR", "25:13.22", 1513.22, 0.94, 148, 18.8, 18], ["Damien Tellez", "JR", "26:13.05", 1573.05, 1.235, 160, 12.2, 19], ["Colin Dinh", "JR", "26:23.26", 1583.26, 1.285, 161, 11.6, 20], ["Will Lindstrom", "FR", "27:10.48", 1630.48, 1.518, 166, 8.8, 21], ["Brandon Johnson", "JR", "28:03.28", 1683.28, 1.778, 172, 5.5, 22], ["Jack Edmonson", "SO", "28:06.43", 1686.43, 1.794, 173, 5.0, 23]]}, {"id": "Voyles Girls 2A", "meet": "Voyles", "label": "Girls 2A", "title": "Voyles Classic 2026 \u2014 High School 2A Girls 5000m", "rankLabel": "2A", "field": 122, "mean": 1632.985, "sd": 319.931, "result": {"place": 10, "of": 13, "pts": 228, "avg": "25:13"}, "runners": [["Vicki Grammer", "SO", "24:34.43", 1474.43, -0.496, 43, 65.3, 1], ["Ruby York", "SO", "24:49.44", 1489.44, -0.449, 45, 63.6, 2], ["Ellianna Wicker", "SO", "25:20.70", 1520.7, -0.351, 50, 59.5, 3], ["Eleanor Bonino", "JR", "25:34.96", 1534.96, -0.306, 54, 56.2, 4], ["Emmy Kotras", "FR", "25:50.44", 1550.44, -0.258, 59, 52.1, 5], ["Margaret Ward", "SO", "26:20.53", 1580.53, -0.164, 64, 47.9, 6], ["Olivia Collins", "SR", "29:39.64", 1779.64, 0.458, 89, 27.3, 7], ["Nevaeh Bowers", "SR", "36:37.27", 2197.27, 1.764, 114, 6.6, 8], ["Kenzie Wilcox", "SO", "40:36.98", 2436.98, 2.513, 119, 2.5, 9], ["Ivy Brame-Blake", "SR", "43:28.02", 2608.02, 3.048, 120, 1.6, 10], ["Leah Hatt", "SO", "45:02.57", 2702.57, 3.343, 121, 0.8, 11], ["Ava Sanderfur", "SO", "45:02.96", 2702.96, 3.344, 122, 0.0, 12]]}, {"id": "Showcase Championship Boys", "meet": "Showcase", "label": "Championship Boys", "title": "The Southern Showcase 2026 \u2014 Championship Boys 5000m", "rankLabel": "", "field": 250, "mean": 1028.679, "sd": 77.036, "result": null, "runners": [["Brent Ferrell", "SR", "15:45.50", 945.5, -1.08, 29, 88.8, 1]]}, {"id": "Showcase Blue Boys", "meet": "Showcase", "label": "Blue Boys", "title": "The Southern Showcase 2026 \u2014 Blue Boys 5000m", "rankLabel": "", "field": 438, "mean": 1176.625, "sd": 116.183, "result": {"place": 23, "of": 50, "pts": 637, "avg": "18:30"}, "runners": [["Miles Fowler", "JR", "17:06.58", 1026.58, -1.291, 17, 96.3, 1], ["Dillon Fell", "JR", "17:40.26", 1060.26, -1.002, 50, 88.8, 2], ["Rolando Muniz-Huerta", "JR", "18:54.87", 1134.87, -0.359, 183, 58.4, 3], ["Samuel Petrony", "SR", "19:19.35", 1159.35, -0.149, 226, 48.5, 4], ["Claude Yriart", "SO", "19:28.19", 1168.19, -0.073, 240, 45.3, 5], ["Tanner Jones", "JR", "20:19.11", 1219.11, 0.366, 318, 27.5, 6], ["Will Blocher", "SO", "21:41.30", 1301.3, 1.073, 390, 11.0, 7]]}, {"id": "Showcase Teal Boys", "meet": "Showcase", "label": "Teal Boys", "title": "The Southern Showcase 2026 \u2014 Teal Boys 5000m", "rankLabel": "", "field": 374, "mean": 1436.912, "sd": 242.591, "result": {"place": 26, "of": 33, "pts": 713, "avg": "23:29"}, "runners": [["Harper Bush", "JR", "22:16.71", 1336.71, -0.413, 145, 61.4, 1], ["Cooper Wallace", "JR", "22:51.65", 1371.65, -0.269, 176, 53.1, 2], ["Joseph Lambert", "JR", "23:21.78", 1401.78, -0.145, 211, 43.7, 3], ["Winston Walker", "JR", "23:31.02", 1411.02, -0.107, 215, 42.6, 4], ["Liam Durham", "SO", "25:26.28", 1526.28, 0.368, 272, 27.4, 5], ["Ethan Newberry", "FR", "25:35.31", 1535.31, 0.406, 275, 26.5, 6], ["Jack Edmonson", "SO", "25:56.40", 1556.4, 0.493, 282, 24.7, 7], ["Brandon Johnson", "JR", "26:25.19", 1585.19, 0.611, 296, 20.9, 8]]}, {"id": "Showcase Teal Girls", "meet": "Showcase", "label": "Teal Girls", "title": "The Southern Showcase 2026 \u2014 Teal Girls 5000m", "rankLabel": "", "field": 214, "mean": 1845.977, "sd": 342.373, "result": {"place": 6, "of": 22, "pts": 184, "avg": "26:03"}, "runners": [["Vicki Grammer", "SO", "24:25.46", 1465.46, -1.111, 18, 92.0, 1], ["Eleanor Bonino", "JR", "25:46.39", 1546.39, -0.875, 42, 80.8, 2], ["Emmy Kotras", "FR", "25:57.35", 1557.35, -0.843, 48, 77.9, 3], ["Ruby York", "SO", "26:27.50", 1587.5, -0.755, 54, 75.1, 4], ["Ellianna Wicker", "SO", "27:40.55", 1660.55, -0.542, 80, 62.9, 5], ["Kenzie Wilcox", "SO", "38:10.27", 2290.27, 1.298, 194, 9.4, 6], ["Leah Hatt", "SO", "38:28.09", 2308.09, 1.35, 196, 8.4, 7], ["Ava Sanderfur", "SO", "43:37.05", 2617.05, 2.252, 207, 3.3, 8]]}, {"id": "Horton Gold Boys", "meet": "Horton", "label": "Gold Boys", "title": "Hoka Frank Horton \"Night\" Classic - HS 2026 \u2014 Gold Boys 5000m", "rankLabel": "", "field": 207, "mean": 1051.364, "sd": 85.951, "result": {"place": 17, "of": 30, "pts": 516, "avg": "17:25"}, "runners": [["Brent Ferrell", "SR", "15:34.90", 934.9, -1.355, 7, 97.1, 1], ["Miles Fowler", "JR", "17:07.10", 1027.1, -0.282, 93, 55.3, 2], ["Dillon Fell", "JR", "17:24.80", 1044.8, -0.076, 111, 46.6, 3], ["Claude Yriart", "SO", "18:15.80", 1095.8, 0.517, 157, 24.3, 4], ["Rolando Muniz-Huerta", "JR", "18:46.70", 1126.7, 0.876, 172, 17.0, 5], ["Samuel Petrony", "SR", "19:01.30", 1141.3, 1.046, 179, 13.6, 6], ["Tanner Jones", "JR", "19:15.60", 1155.6, 1.213, 186, 10.2, 7]]}, {"id": "Horton Purple Boys", "meet": "Horton", "label": "Purple Boys", "title": "Hoka Frank Horton \"Night\" Classic - HS 2026 \u2014 Purple Boys 5000m", "rankLabel": "", "field": 319, "mean": 1214.048, "sd": 142.296, "result": {"place": 41, "of": 43, "pts": 1067, "avg": "21:34"}, "runners": [["Harper Bush", "JR", "20:50.00", 1250, 0.253, 211, 34.0, 1], ["Cooper Wallace", "JR", "21:27.50", 1287.5, 0.516, 232, 27.4, 2], ["Will Blocher", "SO", "21:34.60", 1294.6, 0.566, 234, 26.7, 3], ["Cooper Hubbard", "JR", "21:39.10", 1299.1, 0.598, 239, 25.2, 4], ["Campbell Gnetz", "JR", "22:19.00", 1339, 0.878, 270, 15.4, 5], ["Winston Walker", "JR", "22:24.40", 1344.4, 0.916, 274, 14.2, 6], ["Liam Durham", "SO", "23:35.40", 1415.4, 1.415, 292, 8.5, 7]]}, {"id": "Horton Purple Girls", "meet": "Horton", "label": "Purple Girls", "title": "Hoka Frank Horton \"Night\" Classic - HS 2026 \u2014 Purple Girls 5000m", "rankLabel": "", "field": 249, "mean": 1483.724, "sd": 193.684, "result": {"place": 23, "of": 28, "pts": 573, "avg": "24:27"}, "runners": [["Vicki Grammer", "SO", "23:14.40", 1394.4, -0.461, 92, 63.3, 1], ["Ruby York", "SO", "24:16.30", 1456.3, -0.142, 137, 45.2, 2], ["Ellianna Wicker", "SO", "24:35.10", 1475.1, -0.045, 146, 41.5, 3], ["Emmy Kotras", "FR", "24:59.60", 1499.6, 0.082, 154, 38.3, 4], ["Margaret Ward", "SO", "25:10.00", 1510, 0.136, 159, 36.3, 5], ["Eleanor Bonino", "JR", "25:13.40", 1513.4, 0.153, 161, 35.5, 6], ["Olivia Collins", "SR", "29:15.10", 1755.1, 1.401, 225, 9.7, 7]]}];
+let RACES = [], T = null;
+const MEETS = {Voyles:"MSCCA Voyles Classic · 5 Sep 2026", Showcase:"The Southern Showcase · 19 Sep 2026", Horton:"Hoka Frank Horton Night Classic · 3 Oct 2026"};
+let picked = new Set();
 const chart = document.getElementById("chart");
 const chips = document.getElementById("chips");
 
@@ -222,28 +179,24 @@ function setTheme(t){
 themeBtns.forEach(b => b.addEventListener("click", () => setTheme(b.dataset.themeBtn)));
 
 /* ---------- selection ---------- */
-function scoringDefault(){
-  picked = new Set(TEAMS[team].runners.filter(r => r[7] <= 7).map(r => r[7]));
-}
-document.querySelectorAll("[data-team]").forEach(b => b.addEventListener("click", () => {
-  team = b.dataset.team;
-  document.querySelectorAll("[data-team]").forEach(x =>
-    x.setAttribute("aria-pressed", String(x.dataset.team === team)));
-  scoringDefault(); render();
-}));
-document.getElementById("allBtn").onclick   = () => { picked = new Set(TEAMS[team].runners.map(r => r[7])); render(); };
-document.getElementById("sevenBtn").onclick = () => { scoringDefault(); render(); };
-document.getElementById("noneBtn").onclick  = () => { picked = new Set(); render(); };
+function selectAll(){ picked = new Set(T.runners.map(r => r[7])); }
+function scoringSeven(){ picked = new Set(T.runners.filter(r => r[7] <= 7).map(r => r[7])); }
+const sel = document.getElementById("race");
+sel.addEventListener("change", () => { T = RACES.find(r => r.id === sel.value); scoringSeven(); render(); });
+document.getElementById("allBtn").onclick  = () => { selectAll(); render(); };
+document.getElementById("fiveBtn").onclick = () => { picked = new Set(T.runners.filter(r => r[7] <= 5).map(r => r[7])); render(); };
+document.getElementById("sevenBtn").onclick = () => { scoringSeven(); render(); };
+document.getElementById("noneBtn").onclick = () => { picked = new Set(); render(); };
 
 /* ---------- chart ---------- */
 const css = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-const fmtZ = z => "z " + (z > 0 ? "+" : "−") + Math.abs(z).toFixed(3);
+const sgn = z => (z > 0 ? "+" : z < 0 ? "−" : "");
+const fmtZ = z => "z " + sgn(z) + Math.abs(z).toFixed(3);
 
 function draw(){
-  const T = TEAMS[team];
-  const roster = T.runners.filter(r => picked.has(r[7])).sort((a,b) => a[4] - b[4]);
-  const ink = css("--ink"), blue = css("--blue"), band = css("--band"),
-        ring = css("--dot-ring"), gray = css("--gray");
+  if (!T) return;
+    const roster = T.runners.filter(r => picked.has(r[7])).sort((a,b) => a[4] - b[4]);
+  const ink = css("--ink"), blue = css("--blue"), band = css("--band"), ring = css("--dot-ring");
 
   if (!roster.length){
     chart.style.aspectRatio = "auto";
@@ -252,7 +205,8 @@ function draw(){
   }
 
   const W = 1320, padL = 60, padR = W - 30, plotW = padR - padL;
-  const zMin = -3, zMax = 4;                       // room for the slowest girls' marks
+  const zs = T.runners.map(r => r[4]);
+  const zMin = Math.min(-3, Math.floor(Math.min(...zs))), zMax = Math.max(3, Math.ceil(Math.max(...zs)));
   const labelStrip = 46, top = 116, baseline = 450, curveH = baseline - top - 8;
   const X = z => padL + ((Math.max(zMin, Math.min(zMax, z)) - zMin) / (zMax - zMin)) * plotW;
   const pdf = z => Math.exp(-z * z / 2) / Math.sqrt(2 * Math.PI);
@@ -269,6 +223,7 @@ function draw(){
   const n = roster.length, ROWS = n <= 8 ? 1 : Math.min(5, Math.ceil(n / 5)), PER = Math.ceil(n / ROWS);
   const SHELF_TOP = baseline + 66, ROW_H = 104, LW = plotW / PER - 6;
   const H = SHELF_TOP + (ROWS - 1) * ROW_H + 116;
+  const place = rk => (T.rankLabel ? "2A #" + rk : "#" + rk + " of " + T.field);
   const pct = (v, total) => ((v / total) * 100).toFixed(3) + "%";
 
   const bands = [
@@ -291,27 +246,27 @@ function draw(){
     const cx = X(z), cy = Y(z);
     const lcx = padL + (col + 0.5) * (plotW / PER);
     const ly = SHELF_TOP + row * ROW_H;
-    const color = finish <= T.scorers ? blue : band;
+    const color = (finish <= 5 && T.runners.length >= 5) ? blue : band;
     const shelfY = baseline + 26 + row * 8;
     marks += `<path d="M ${cx.toFixed(1)} ${(cy+7).toFixed(1)} L ${cx.toFixed(1)} ${shelfY.toFixed(1)} L ${lcx.toFixed(1)} ${(ly-18).toFixed(1)} L ${lcx.toFixed(1)} ${(ly-8).toFixed(1)}" fill="none" stroke="${color}" stroke-width="1" opacity=".45" vector-effect="non-scaling-stroke"></path>`
            + `<circle cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="6" fill="${color}" stroke="${ring}" stroke-width="2" vector-effect="non-scaling-stroke"></circle>`
            + `<circle class="hit" cx="${cx.toFixed(1)}" cy="${cy.toFixed(1)}" r="18" tabindex="0" role="button"`
-           + ` aria-label="${name}, ${mark}, ${fmtZ(z)}, 2A place ${rank}"`
+           + ` aria-label="${name}, ${mark}, ${fmtZ(z)}, place ${rank}"`
            + ` data-left="${pct(cx,W)}" data-top="${pct(cy-14,H)}" data-name="${name}" data-mark="${mark}"`
-           + ` data-z="${fmtZ(z)}" data-rank="${rank}" data-cls="${cls}" data-finish="${finish}"></circle>`;
+           + ` data-z="${fmtZ(z)}" data-rank="${rank}" data-cls="${cls}" data-finish="${finish}" data-beat="${beaten}"></circle>`;
     labels += `<div class="lab" style="left:${pct(lcx,W)};top:${pct(ly,H)};width:${pct(LW,W)}">`
             + `<div class="nm">${name}</div>`
             + `<div class="mk" style="color:${color}">${mark}</div>`
             + `<div class="z">${fmtZ(z)}</div>`
-            + `<div class="rk">2A #${rank} · ${cls} · beat ${beaten}%</div></div>`;
+            + `<div class="rk">${place(rank)} · ${cls} · beat ${beaten}%</div></div>`;
   });
 
   const SIGMA = [
-    { a:-3, b:-2, t:"2.3%",  s:"beyond −2 SD" },
+    { a: zMin, b:-2, t:"2.3%",  s:"beyond −2 SD" },
     { a:-2, b:-1, t:"13.6%", s:"−2 to −1 SD" },
     { a:-1, b: 1, t:"68.2%", s:"the middle of the field · ±1 SD" },
     { a: 1, b: 2, t:"13.6%", s:"+1 to +2 SD" },
-    { a: 2, b: 4, t:"2.3%",  s:"beyond +2 SD" }
+    { a: 2, b: zMax, t:"2.3%",  s:"beyond +2 SD" }
   ];
   const bandLabels = SIGMA.map(s =>
     `<div class="bandlab" style="left:${pct(X(s.a),W)};width:${pct(X(s.b)-X(s.a),W)};top:${pct(labelStrip,H)}">
@@ -337,7 +292,8 @@ function draw(){
        <dl>
          <dt>Time</dt><dd>${d.mark}</dd>
          <dt>Z-score</dt><dd>${d.z}</dd>
-         <dt>Place</dt><dd>2A #${d.rank}</dd>
+         <dt>Place</dt><dd>${(T.rankLabel ? "2A #" + d.rank : "#" + d.rank + " of " + T.field)}</dd>
+         <dt>Beat</dt><dd>${d.beat}%</dd>
          <dt>Team</dt><dd>#${d.finish} · ${d.cls}</dd>
        </dl><span class="arrow"></span>`;
     tip.style.left = d.left;
@@ -355,13 +311,12 @@ function draw(){
 
 /* ---------- roster chips ---------- */
 function drawChips(){
-  const T = TEAMS[team];
-  chips.innerHTML = T.runners.map(r => {
+    chips.innerHTML = T.runners.map(r => {
     const on = picked.has(r[7]);
     return `<button class="chip" type="button" aria-pressed="${on}" data-finish="${r[7]}">
       <span class="box" aria-hidden="true">✓</span>
-      <span class="who"><b>${r[0]}</b><small>${r[1]} · ${r[2]} · 2A #${r[5]}</small></span>
-      <span class="zz">${(r[4] > 0 ? "+" : "−") + Math.abs(r[4]).toFixed(2)}</span>
+      <span class="who"><b>${r[0]}</b><small>${r[1]} · ${r[2]} · ${T.rankLabel ? "2A #" + r[5] : "#" + r[5] + " of " + T.field}</small></span>
+      <span class="zz">${sgn(r[4]) + Math.abs(r[4]).toFixed(2)}</span>
     </button>`;
   }).join("");
   chips.querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => {
@@ -371,18 +326,47 @@ function drawChips(){
   }));
 }
 
+function ord(n){ n=Number(n); const s=["th","st","nd","rd"], v=n%100; return n+(s[(v-20)%10]||s[v]||s[0]); }
 function render(){
-  const T = TEAMS[team];
+  const meet = MEETS[T.meet] || T.meet;
+  document.getElementById("eyebrow").textContent = meet + " · " + T.label;
+  document.getElementById("title").textContent = "The Royals on the " + T.meet + " curve";
+  document.getElementById("stand").textContent =
+    `Every Royal in the ${T.label} race, placed on the normal curve of that race's ${T.field}-runner field. Left of centre is faster than the field average.`;
   document.getElementById("rosterHead").textContent =
-    `${T.label} roster — ${picked.size} of ${T.runners.length} on the curve`;
+    `${T.label} — ${picked.size} of ${T.runners.length} on the curve`;
   document.getElementById("fieldnote").textContent =
-    `Field mean ${(T.mean/60|0)}:${(T.mean%60).toFixed(2).padStart(5,"0")} · SD ${T.sd.toFixed(1)}s`;
+    `${T.field} finishers · mean ${(T.mean/60|0)}:${(T.mean%60).toFixed(2).padStart(5,"0")} · SD ${T.sd.toFixed(1)}s`;
+  const top = T.runners.filter(r => r[7] <= 5);
+  const tz = top.length === 5 ? top.reduce((a,r) => a + r[4], 0) / 5 : null;
+  const stats = [];
+  if (T.result) stats.push([ord(T.result.place) + " of " + T.result.of, "Team place"], [T.result.pts, "Points"], [T.result.avg, "Top-5 average"]);
+  stats.push([tz === null ? "—" : sgn(tz) + Math.abs(tz).toFixed(2), tz === null ? "Team z (under 5 runners)" : "Team z (top 5)"]);
+  document.getElementById("summary").innerHTML =
+    stats.map(([v,k]) => `<div class="stat"><div class="v">${v}</div><div class="k">${k}</div></div>`).join("");
   document.getElementById("foot").textContent =
-    "Z-score = (runner seconds − field mean) ÷ field SD, computed within the meet's own 2A field · marks as raced · MileSplit, MSCCA Voyles Classic 2026";
+    "Z-score = (runner seconds − field mean) ÷ field population SD, computed within this race's own field · from the MLK XC 2026 Raw Data workbook · source: MileSplit";
   drawChips(); draw();
 }
 
-scoringDefault();
-setTheme(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-render();
+function load(races){
+  RACES = races;
+  if (!RACES.length){ document.getElementById("chart").innerHTML = '<p class="empty">No race sheets found in this workbook.</p>'; return; }
+  const groups = {};
+  RACES.forEach(r => (groups[r.meet] = groups[r.meet] || []).push(r));
+  sel.innerHTML = Object.keys(groups).map(m =>
+    `<optgroup label="${MEETS[m] || m}">` + groups[m].map(r => `<option value="${r.id}">${m} · ${r.label}</option>`).join("") + `</optgroup>`).join("");
+  const lastMeet = RACES[RACES.length - 1].meet;
+  T = RACES.find(r => r.meet === lastMeet);
+  sel.value = T.id;
+  scoringSeven(); render();
+}
+document.documentElement.setAttribute("data-theme", window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+themeBtns.forEach(b => b.setAttribute("aria-pressed", String(b.dataset.themeBtn === document.documentElement.getAttribute("data-theme"))));
+if (window.google && google.script && google.script.run){
+  google.script.run.withSuccessHandler(load)
+    .withFailureHandler(e => { document.getElementById("chart").innerHTML = '<p class="empty">Could not read the race sheets: ' + e.message + '</p>'; })
+    .getRaces();
+} else if (window.__DEMO) { load(window.__DEMO); }
 </script>
+</body></html>
